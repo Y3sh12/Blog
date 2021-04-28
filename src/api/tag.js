@@ -14,8 +14,9 @@ export default {
         removeSingleTag: (data) => req.get(`/admin/tag/${data}`),
         // 批量删除
         removeBatch: (data) => req.get("/admin/tag/remove", { 'ids': data }),
-
-        // 编辑
-        // edit: (data) => req.post("/admin/tag/" + data.id, { 'name': data.name }),
+        // 新增
+        insert: (data) => req.post("/admin/tag", data),
+        // 更新
+        update: (data) => req.post(`/admin/tag/${data.id}`, data),
     }
 }

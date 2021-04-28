@@ -14,6 +14,10 @@ export default {
         removeSingle: (data) => req.get(`/admin/type/${data}`),
         // 批量删除
         removeBatch: (data) => req.get("/admin//type/remove", { 'ids': data }),
+        // 新增
+        insert: (data) => req.post("/admin/type", data),
+        // 更新
+        update: (data) => req.post(`/admin/type/${data.id}`, data),
 
     }
 }

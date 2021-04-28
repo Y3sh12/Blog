@@ -50,7 +50,7 @@
           <th>操作</th>
         </tr>
       </thead>
-      <tbody ref="tbody">
+      <tbody>
         <tr v-for="type in list" :key="type.id">
           <td>
             <div class="ui checkbox middle aligned child">
@@ -63,10 +63,10 @@
           <td></td>
           <td></td>
           <td>
-            <button type="button" class="ui mini teal button">
+            <button type="button" class="ui mini teal button" @click="toEdit(type.id,type.name)">
               编辑
             </button>
-            <button type="button" class="ui mini orange button removeBtn" @click="toRemove(type.id)">
+            <button type="button" class="ui mini orange button removeBtn" @click="toRemove(type.id,type.name)">
               删除
             </button>
           </td>
@@ -76,46 +76,49 @@
     </table>
   </div>
   <!-- 模态框 -->
-  <modal>
+  <modal @pass-data="submit" :data="{opt:modal.type,id:typeId,hint:hint}">
     <template v-slot:title>{{modal.title}}</template>
-    <template v-slot:item></template>
-    <template v-slot:default></template>
-
+    <template v-slot:item>{{modal.item}}</template>
+    <template v-slot:default>{{modal.btn}}</template>
   </modal>
   
 </template>
 <script>
 import DataPaging from "@/components/DataPaging.vue";
 import Modal from "@/components/Modal.vue";
+
 import checked from "@/assets/js/checked.js";
-// import { popupAddModal, popupEditModal } from "@/assets/js/common.js";
-import  modal from "@/assets/js/modal.js";
 import api from "@/api/type.js";
+import  modal from "@/assets/js/modal.js";
 import paging from "@/data/pages.js";
 export default {
-  name: "Blogs",
+  name: "Types",
   components: {
     DataPaging,
     Modal,
   },
   data() {
     return {
-      list: [],
-      page: {},
-      typeId: 0,
-      message:"",
+      list: [], // 表格数据
+      page: {}, // 分页数据
       selected:[], // 选中项ID
+      message:"", // 提示信息
 
       modal:{ // 模态框
+        type:-1, // 0：编辑 1：新增
         title:"", // 标题
-        item:"", // 数据项
-        btn:"" // 确认按钮
-      }
+        item:"类别名称", // 数据项名称
+        btn:"" // 确认按钮名称
+      },
+      typeId: undefined, 
+      hint:"", // 模态框中的文本框提示
     };
   },
-
+  // 定义抛出事件
+  emits:["show","hint"],
+  
+  // 初始化类别列表
   created() {
-    // 初始化类别列表
     this.renderTypeList();
   },
   mounted() {
@@ -134,9 +137,11 @@ export default {
     },
 
     // 删除单个
-    async toRemove(id){
-      await api.back.removeSingle(id);
-      this.renderTypeList();
+    async toRemove(id,name){
+      if(confirm(`确定要删除类别【${name}】吗？请谨慎操作！`)){
+        await api.back.removeSingle(id);
+        this.renderTypeList();
+      }
     },
 
     // 获取选中项ID
@@ -153,28 +158,66 @@ export default {
     // 批量删除
     async removeBatch(){
         if(this.selected.length > 0) {
-          await api.back.removeBatch(this.selected.toString());
-          this.renderTypeList();
+          if(confirm("确定要批量删除吗？请谨慎操作！")){
+            await api.back.removeBatch(this.selected.toString());
+            this.renderTypeList();
+          }
         }else {
           // 显示提示信息
-          this.message = "请至少选择一项！";
-          this.$emit('hint',this.message);
+         this.showMessage("请至少选择一项！");
         }
     },
 
+    // 弹出新增模态框
     toInsert(){
-      console.log("弹出新增框");
-      this.modal.title = "新增分类";
-      this.modal.item = "分类名称";
+      this.typeId = undefined;
+      this.modal.type = 1;
+      this.modal.title = "新增类别";
       this.modal.btn = "新增";
-      console.log(this.modal.title);
-      modal.popupModal();
+      this.hint = "请输入新的类别名称";
+      modal();
     },
 
-    // showEditModal(id){
-    //   this.typeId = id;
-    //   popupEditModal();
-    // },
+    // 弹出编辑模态框
+    toEdit(typeId,typeName){
+      this.typeId = typeId;
+      this.modal.type = 0;
+      this.modal.title = "编辑类别";
+      this.modal.btn = "更新";
+      this.hint = typeName;
+      modal();
+    },
+
+    // 点击模态框确认按钮后发送请求
+    submit(data){
+      // 判断是新增还是编辑
+      if(data.opt === 1){ // 新增
+        this.insert({name:data.name});
+      }else if(data.opt === 0){ // 编辑
+        this.update({id:data.id,name:data.name,hint:data.hint});
+      }
+    },
+
+    // 新增类别
+    async insert(data){
+      await api.back.insert(data);
+      this.renderTypeList();
+      // 显示提示信息
+         this.showMessage(` 类别【${data.name}】已新增成功！`);
+    },
+
+    // 编辑类别
+    async update(data){
+      await api.back.update(data);
+      this.renderTypeList();
+      this.showMessage(` 类别【${data.hint}】已更新为：【${data.name}】！`);
+    },
+
+    // 显示提示信息
+    showMessage(msg){
+      this.message = msg;
+      this.$emit('hint',this.message);
+    }
   },
 };
 </script>

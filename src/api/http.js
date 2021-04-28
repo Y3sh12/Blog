@@ -27,7 +27,7 @@ const req = {
     },
     async post(url, param) {
         try {
-            let response = await axios.get(url, qs.stringify(param));
+            let response = await axios.post(url, qs.stringify(param));
             let result = response.data;
             return new Promise((resolve, reject) => {
                 if (result.code === 1) {

@@ -15,7 +15,7 @@
           </button>
         </div>
         <div class="field">
-          <button type="button" class="ui icon teal button" @click="showAddModal">
+          <button type="button" class="ui icon teal button" @click="toInsert">
             <i class="edit icon"></i>
             <span class="m-mobile-hide">新增标签</span>
           </button>
@@ -63,10 +63,10 @@
           <td></td>
           <td></td>
           <td>
-            <button type="button" class="ui mini teal button" @click="showEditModal(tag.id)">
+            <button type="button" class="ui mini teal button" @click="toEdit(tag.id,tag.name)">
               编辑
             </button>
-            <button type="button" class="ui mini orange button removeBtn" @click="toRemove(tag.id)">
+            <button type="button" class="ui mini orange button removeBtn" @click="toRemove(tag.id,tag.name)">
               删除
             </button>
           </td>
@@ -76,17 +76,22 @@
     </table>
   </div>
   <!-- 模态框 -->
-  <modal :data-id="tagId" ref="modal"></modal>
+  <modal @pass-data="submit" :data="{opt:modal.type,id:tagId,hint:hint}">
+    <template v-slot:title>{{modal.title}}</template>
+    <template v-slot:item>{{modal.item}}</template>
+    <template v-slot:default>{{modal.btn}}</template>
+  </modal>
 </template>
 <script>
 import DataPaging from "@/components/DataPaging.vue";
 import Modal from "@/components/Modal.vue";
+
 import checked from "@/assets/js/checked.js";
-import { popupAddModal,popupEditModal } from "@/assets/js/common.js";
 import api from "@/api/tag.js";
+import  modal from "@/assets/js/modal.js";
 import paging from "@/data/pages.js";
 export default {
-  name: "Blogs",
+  name: "Tags",
   components: {
     DataPaging,
     Modal,
@@ -95,13 +100,24 @@ export default {
     return {
       list: [],
       page: {},
-      tagId: 0,
-      message:"",
       selected:[], // 选中项ID
+      message:"",
+      modal:{ // 模态框
+        type:-1, // 0：编辑 1：新增
+        title:"", // 标题
+        item:"标签名称", // 数据项名称
+        btn:"" // 确认按钮名称
+      },
+      tagId: undefined, 
+      hint:"", // 模态框中的文本框提示
     };
   },
+
+  // 定义抛出事件
+  emits:["show","hint"],
+
+  // 初始化标签列表
   created() {
-    // 初始化标签列表
     this.renderTagList();
   },
   mounted() {
@@ -115,13 +131,15 @@ export default {
       this.page = paging(rs);
     },
 
-    toPage(number){
-      this.renderTagList(number);
+    toPage(pageNum){
+      this.renderTagList(pageNum);
     },
 
-    async toRemove(id){
+    async toRemove(id,name){
+       if(confirm(`确定要删除标签【${name}】吗？请谨慎操作！`)){
       await api.back.removeSingleTag(id);
       this.renderTagList();
+       }
     },
 
     // 获取选中项ID
@@ -138,25 +156,66 @@ export default {
     // 批量删除
     async removeBatch(){
         if(this.selected.length > 0) {
+          if(confirm("确定要批量删除吗？请谨慎操作！")){
           await api.back.removeBatch(this.selected.toString());
           this.renderTagList();
+          }
         }else {
           // 显示提示信息
-          this.message = "请至少选择一项！";
-          this.$emit('hint',this.message);
+         this.showMessage("请至少选择一项！");
         }
     },
 
-    showAddModal(){
-      popupAddModal();
+    // 弹出新增模态框
+    toInsert(){
+      this.tagId = undefined;
+      this.modal.type = 1;
+      this.modal.title = "新增标签";
+      this.modal.btn = "新增";
+      this.hint = "请输入新的标签名称";
+      modal();
     },
 
-    showEditModal(id){
-      this.tagId = id;
-      popupEditModal();
-      // 清空文本框中的值
-      this.$refs.modal.newName = null;
+    // 弹出编辑模态框
+    toEdit(tagId,tagName){
+      this.tagId = tagId;
+      this.modal.type = 0;
+      this.modal.title = "编辑标签";
+      this.modal.btn = "更新";
+      this.hint = tagName;
+      modal();
     },
+
+    // 点击模态框确认按钮后发送请求
+    submit(data){
+      // 判断是新增还是编辑
+      if(data.opt === 1){ // 新增
+        this.insert({name:data.name});
+      }else if(data.opt === 0){ // 编辑
+        this.update({id:data.id,name:data.name,hint:data.hint});
+      }
+    },
+
+    // 新增
+    async insert(data){
+      await api.back.insert(data);
+      this.renderTagList();
+      // 显示提示信息
+         this.showMessage(` 标签【${data.name}】已新增成功！`);
+    },
+
+    // 编辑
+    async update(data){
+      await api.back.update(data);
+      this.renderTagList();
+      this.showMessage(` 标签【${data.hint}】已更新为：【${data.name}】！`);
+    },
+
+    // 显示提示信息
+    showMessage(msg){
+      this.message = msg;
+      this.$emit('hint',this.message);
+    }
   },
 };
 </script>
