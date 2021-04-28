@@ -1,0 +1,63 @@
+/* 蓝色按钮 #2fb9d4 */
+
+.button.m-sky-blue {
+    background-color: #2fb9d4;
+    color: #fff;
+}
+
+.button.m-sky-blue:hover {
+    background-color: rgba(47, 185, 212, .8);
+    color: rgba(255, 255, 255, .8);
+}
+
+
+/* check-icon #49b876 */
+
+.icon.m-check-green {
+    color: #49b876;
+}
+
+
+/* 刷新按钮 */
+
+.sync-icon {
+    position: absolute;
+    top: 1.6em;
+    right: 1.3em;
+    z-index: 999;
+}
+
+.sync-icon:hover {
+    cursor: pointer;
+}
+
+
+/* 复选框 */
+
+.ui.checkbox input:indeterminate~.box:after,
+.ui.checkbox input:indeterminate~label:after {
+    content: '' !important;
+}
+
+
+/* 文本一行显示 */
+
+.table tbody td {
+    max-width: 9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 768px) {
+    /* input占一行 */
+    .m-form>.fields>div.field,
+    .m-form>.fields>div.field button {
+        width: 100%;
+    }
+    .m-form>.fields>div.field,
+    table a.button,
+    .m-publish-btn button {
+        margin-bottom: 0.5em !important;
+    }
+}
