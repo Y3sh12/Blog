@@ -18,6 +18,8 @@ export default {
         insert: (data) => req.post("/admin/type", data),
         // 更新
         update: (data) => req.post(`/admin/type/${data.id}`, data),
+        // 搜索
+        search: (data) => req.get("/admin/type/search", { 'name': data.value, 'pageNum': data.pageNum }),
 
     }
 }

@@ -12,7 +12,7 @@ axios.defaults.baseURL = "/api";
 const req = {
     async get(url, param) {
         try {
-            let response = await axios.get(url, param);
+            let response = await axios.get(url, { params: param });
             let result = response.data;
             return new Promise((resolve, reject) => {
                 if (result.code === 1) {

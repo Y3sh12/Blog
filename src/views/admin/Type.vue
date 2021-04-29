@@ -6,10 +6,10 @@
     <form class="ui form m-form">
       <div class="fields">
         <div class="field">
-          <input type="text" name="name" id="" placeholder="类别" required />
+          <input type="text" name="name" id="" placeholder="类别" v-model="searchValue" @focus="toInput" />
         </div>
         <div class="field">
-          <button type="button" class="ui icon button m-sky-blue">
+          <button type="button" class="ui icon button m-sky-blue" @click="toSearch">
             <i class="search icon"></i>
             <span class="m-mobile-hide">搜索</span>
           </button>
@@ -102,6 +102,7 @@ export default {
       list: [], // 表格数据
       page: {}, // 分页数据
       selected:[], // 选中项ID
+      searchValue:"", // 搜索值
       message:"", // 提示信息
 
       modal:{ // 模态框
@@ -125,6 +126,14 @@ export default {
     // 复选框选择
     checked();
   },
+  watch:{
+    "$route":function(val){
+      if(val.path==="/admin/type"){
+        this.searchValue ="";
+        this.renderTypeList();
+      }
+    }
+  },
   methods: {
     async renderTypeList(pageNum) {
       let rs = await api.back.getTypeList(pageNum);
@@ -133,7 +142,13 @@ export default {
     },
 
     toPage(pageNum){
-      this.renderTypeList(pageNum);
+      // 判断当前路由
+      if(this.$route.path.includes("search")){
+        this.searchValue = this.$route.query.keywords;
+        this.query(pageNum);
+      }else{
+        this.renderTypeList(pageNum);
+      }
     },
 
     // 删除单个
@@ -147,7 +162,7 @@ export default {
     // 获取选中项ID
     getSelected(e,id){
       // 进行选择时，提示信息隐藏
-      this.$emit('show',false);
+      this.hideMessage();
       if(e.target.checked){
         this.selected.push(id);
       }else {
@@ -217,7 +232,52 @@ export default {
     showMessage(msg){
       this.message = msg;
       this.$emit('hint',this.message);
-    }
+    },
+
+    // 隐藏提示信息
+    hideMessage(){
+      this.message = "";
+      this.$emit('show',false);
+    },
+
+    // 文本框獲取焦點
+    toInput(){
+      this.hideMessage();
+      this.searchValue = "";
+    },
+
+    // 搜索
+    toSearch(){
+      if(!this.verify()){
+        return;
+      }
+      // 跳轉
+      this.$router.push({
+        path:"/admin/type/search",
+        query:{keywords:this.searchValue}
+      });
+      this.query();
+    },
+
+    // 查询
+    async query(pageNum){
+      let rs = await api.back.search({value:this.searchValue,pageNum:pageNum});
+      this.list = rs.list;
+      this.page = paging(rs);
+    },
+
+    // 验证文本框输入
+    verify(){
+      if(!this.searchValue){
+          this.showMessage("请输入要搜索的关键字！");
+          return false;
+      }
+      if(/^\s+$/gi.test(this.searchValue)){
+          this.showMessage("不能输入纯空格，请重新输入！");
+          return false;
+      }
+      return true;
+    },
   },
 };
 </script>

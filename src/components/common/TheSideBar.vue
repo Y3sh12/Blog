@@ -11,10 +11,10 @@
       <h3 class="ui inverted centered header">Sanna</h3>
     </a>
     <div class="item">
-      <router-link to="/admin/blogs" class="item" active-class="m-active" exact>
+      <router-link to="/admin/blog" class="item" active-class="m-active" exact>
         <i class="file text icon"></i>文章管理
       </router-link>
-      <router-link to="/admin/types" class="item" active-class="m-active" exact>
+      <router-link to="/admin/type" class="item" active-class="m-active" exact>
         <i class="th icon"></i>分类管理
       </router-link>
       <router-link to="/admin/tags" class="item" active-class="m-active" exact>
@@ -50,6 +50,7 @@ export default {
       seen: true,
     };
   },
+
   mounted() {
     removeClassOnSidebar();
   },

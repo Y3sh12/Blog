@@ -41,16 +41,22 @@ const routes = [{
     component: () =>
         import ("../views/admin/Default.vue"),
     children: [{
-            path: "blogs",
-            name: "Blogs",
+            path: "blog",
+            name: "Blog",
             component: () =>
-                import ("../views/admin/Blogs.vue"),
+                import ("../views/admin/Blog.vue"),
         },
         {
-            path: "types",
-            name: "Types",
+            path: "type",
+            name: "Type",
             component: () =>
-                import ("../views/admin/Types.vue")
+                import ("../views/admin/Type.vue")
+        },
+        {
+            path: "type/search",
+            name: "TypeSearch",
+            component: () =>
+                import ("../views/admin/Type.vue")
         },
         {
             path: "tags",
