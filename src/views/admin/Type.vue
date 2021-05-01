@@ -3,7 +3,7 @@
     <!-- 刷新按钮 -->
     <div class="sync-icon"><i class="sync grey icon"></i></div>
     <!-- 表格 -->
-    <form class="ui form m-form">
+    <form class="ui form m-form" @submit.prevent="submit">
       <div class="fields">
         <div class="field">
           <input type="text" name="name" id="" placeholder="类别" v-model="searchValue" @focus="toInput" />
@@ -120,7 +120,7 @@ export default {
   
   // 初始化类别列表
   created() {
-    this.renderTypeList();
+    this.loadData();
   },
   mounted() {
     // 复选框选择
@@ -128,6 +128,7 @@ export default {
   },
   watch:{
     "$route":function(val){
+      this.hideMessage();
       if(val.path==="/admin/type"){
         this.searchValue ="";
         this.renderTypeList();
@@ -135,6 +136,16 @@ export default {
     }
   },
   methods: {
+    loadData(pageNum){
+      // 判断当前路由，选择加载数据
+      if(this.$route.path.includes("search")){
+        this.searchValue = this.$route.query.keywords;
+        this.queryTypeList(pageNum);
+      }else{
+        this.renderTypeList(pageNum);
+      }
+    },
+
     async renderTypeList(pageNum) {
       let rs = await api.back.getTypeList(pageNum);
       this.list = rs.list;
@@ -142,13 +153,7 @@ export default {
     },
 
     toPage(pageNum){
-      // 判断当前路由
-      if(this.$route.path.includes("search")){
-        this.searchValue = this.$route.query.keywords;
-        this.query(pageNum);
-      }else{
-        this.renderTypeList(pageNum);
-      }
+      this.loadData(pageNum);
     },
 
     // 删除单个
@@ -248,7 +253,7 @@ export default {
 
     // 搜索
     toSearch(){
-      if(!this.verify()){
+      if(!this.validate()){
         return;
       }
       // 跳轉
@@ -256,18 +261,18 @@ export default {
         path:"/admin/type/search",
         query:{keywords:this.searchValue}
       });
-      this.query();
+      this.queryTypeList();
     },
 
     // 查询
-    async query(pageNum){
+    async queryTypeList(pageNum){
       let rs = await api.back.search({value:this.searchValue,pageNum:pageNum});
       this.list = rs.list;
       this.page = paging(rs);
     },
 
     // 验证文本框输入
-    verify(){
+    validate(){
       if(!this.searchValue){
           this.showMessage("请输入要搜索的关键字！");
           return false;

@@ -10,7 +10,7 @@
                 <div class="field">
                     <div class="ui left labeled input">
                         <label class="ui teal basic label"><slot name="item"></slot></label>
-                        <input type="text" name="name" :placeholder="hint" v-model="name">
+                        <input type="text" name="name" :placeholder="hint" v-model="name" ref="name">
                     </div>
                 </div>
                 <div class="ui mini yellow message">提示：{{message}}</div>
@@ -61,6 +61,8 @@ export default {
             }
             if(/^\s+$/gi.test(this.name)){
                 this.message = "不能输入纯空格，请重新输入！";
+                this.name = "";
+                this.$refs.name.focus();
                 return false;
             }
             return true;
