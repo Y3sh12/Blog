@@ -17,7 +17,7 @@
       <router-link to="/admin/type" class="item" active-class="m-active" exact>
         <i class="th icon"></i>分类管理
       </router-link>
-      <router-link to="/admin/tags" class="item" active-class="m-active" exact>
+      <router-link to="/admin/tag" class="item" active-class="m-active" exact>
         <i class="tags icon"></i>标签管理
       </router-link>
       <router-link

@@ -1,15 +1,15 @@
 <template>
   <div class="ui segment">
     <!-- 刷新按钮 -->
-    <div class="sync-icon"><i class="sync grey icon"></i></div>
+    <!-- <div class="sync-icon"><i class="sync grey icon"></i></div> -->
     <!-- 表格 -->
-    <form class="ui form m-form">
+    <form class="ui form m-form" @submit.prevent="submit">
       <div class="fields">
         <div class="field">
-          <input type="text" name="name" id="" placeholder="标签" required />
+          <input type="text" name="name" id="" placeholder="标签" v-model="searchValue" @focus="toInput" />
         </div>
         <div class="field">
-          <button type="button" class="ui icon button m-sky-blue">
+          <button type="button" class="ui icon button m-sky-blue" @click="toSearch">
             <i class="search icon"></i>
             <span class="m-mobile-hide">搜索</span>
           </button>
@@ -91,7 +91,7 @@ import api from "@/api/tag.js";
 import  modal from "@/assets/js/modal.js";
 import paging from "@/data/pages.js";
 export default {
-  name: "Tags",
+  name: "Tag",
   components: {
     DataPaging,
     Modal,
@@ -101,6 +101,7 @@ export default {
       list: [],
       page: {},
       selected:[], // 选中项ID
+      searchValue:"", // 搜索值
       message:"",
       modal:{ // 模态框
         type:-1, // 0：编辑 1：新增
@@ -116,15 +117,35 @@ export default {
   // 定义抛出事件
   emits:["show","hint"],
 
+  watch:{
+    "$route":function(val){
+      this.hideMessage();
+      if(val.path==="/admin/tag"){
+        this.searchValue ="";
+        this.renderTagList();
+      }
+    }
+  },
+
   // 初始化标签列表
   created() {
-    this.renderTagList();
+    this.loadData();
   },
   mounted() {
     // 复选框选择
     checked();
   },
   methods: {
+    // 判断当前路由，选择加载数据
+    loadData(pageNum){
+      if(this.$route.path.includes("search")){
+        this.searchValue = this.$route.query.keywords;
+        this.queryTagList(pageNum);
+      }else{
+        this.renderTagList(pageNum);
+      }
+    },
+
     async renderTagList(data) {
       let rs = await api.back.getTagList(data);
       this.list = rs.list;
@@ -132,7 +153,7 @@ export default {
     },
 
     toPage(pageNum){
-      this.renderTagList(pageNum);
+      this.loadData(pageNum);
     },
 
     async toRemove(id,name){
@@ -145,7 +166,7 @@ export default {
     // 获取选中项ID
     getSelected(e,id){
       // 进行选择时，提示信息隐藏
-      this.$emit('show',false);
+      this.hideMessage();
       if(e.target.checked){
         this.selected.push(id);
       }else {
@@ -215,7 +236,57 @@ export default {
     showMessage(msg){
       this.message = msg;
       this.$emit('hint',this.message);
-    }
+    },
+
+    // 隐藏提示信息
+    hideMessage(){
+      this.message = "";
+      this.$emit('show',false);
+    },
+
+    // 文本框獲取焦點
+    toInput(){
+      this.hideMessage();
+      this.searchValue = "";
+    },
+
+    // 搜索
+    toSearch(){
+      if(!this.validate()){
+        return;
+      }
+      // 跳轉
+      this.$router.push({
+        path:"/admin/tag/search",
+        query:{keywords:this.searchValue}
+      });
+      this.queryTagList();
+    },
+
+    // 查询
+    async queryTagList(pageNum){
+      let rs = await api.back.search({value:this.searchValue,pageNum:pageNum});
+      if(rs.list){
+        this.list = rs.list;
+        this.page = paging(rs);
+      }else {
+        this.showMessage(rs.message);
+        this.renderTagList();
+      }
+    },
+
+    // 验证文本框输入
+    validate(){
+      if(!this.searchValue){
+          this.showMessage("请输入要搜索的关键字！");
+          return false;
+      }
+      if(/^\s+$/gi.test(this.searchValue)){
+          this.showMessage("不能输入纯空格，请重新输入！");
+          return false;
+      }
+      return true;
+    },
   },
 };
 </script>

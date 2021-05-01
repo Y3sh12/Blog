@@ -50,20 +50,29 @@ const routes = [{
             path: "type",
             name: "Type",
             component: () =>
-                import ("../views/admin/Type.vue")
+                import ("../views/admin/Type.vue"),
+            children: [{
+                path: "search",
+                name: "TypeSearch",
+                component: () =>
+                    import ("../views/admin/Type.vue")
+            }, ]
         },
+
         {
-            path: "type/search",
-            name: "TypeSearch",
+            path: "tag",
+            name: "Tag",
             component: () =>
-                import ("../views/admin/Type.vue")
+                import ("../views/admin/Tag.vue"),
+            children: [{
+                path: "search",
+                name: "TagSearch",
+                component: () =>
+                    import ("../views/admin/Tag.vue")
+            }, ]
         },
+
         {
-            path: "tags",
-            name: "Tags",
-            component: () =>
-                import ("../views/admin/Tags.vue")
-        }, {
             path: "publish",
             name: "Publish",
             component: () =>

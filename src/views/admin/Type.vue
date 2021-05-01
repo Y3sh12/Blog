@@ -1,7 +1,7 @@
 <template>
   <div class="ui segment">
     <!-- 刷新按钮 -->
-    <div class="sync-icon"><i class="sync grey icon"></i></div>
+    <!-- <div class="sync-icon"><i class="sync grey icon"></i></div> -->
     <!-- 表格 -->
     <form class="ui form m-form" @submit.prevent="submit">
       <div class="fields">
@@ -118,14 +118,6 @@ export default {
   // 定义抛出事件
   emits:["show","hint"],
   
-  // 初始化类别列表
-  created() {
-    this.loadData();
-  },
-  mounted() {
-    // 复选框选择
-    checked();
-  },
   watch:{
     "$route":function(val){
       this.hideMessage();
@@ -135,9 +127,17 @@ export default {
       }
     }
   },
+  // 初始化类别列表
+  created() {
+    this.loadData();
+  },
+  mounted() {
+    // 复选框选择
+    checked();
+  },
   methods: {
+    // 判断当前路由，选择加载数据
     loadData(pageNum){
-      // 判断当前路由，选择加载数据
       if(this.$route.path.includes("search")){
         this.searchValue = this.$route.query.keywords;
         this.queryTypeList(pageNum);
@@ -267,8 +267,13 @@ export default {
     // 查询
     async queryTypeList(pageNum){
       let rs = await api.back.search({value:this.searchValue,pageNum:pageNum});
-      this.list = rs.list;
-      this.page = paging(rs);
+      if(rs.list){
+        this.list = rs.list;
+        this.page = paging(rs);
+      }else {
+        this.showMessage(rs.message);
+        this.renderTypeList();
+      }
     },
 
     // 验证文本框输入

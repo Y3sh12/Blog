@@ -5,7 +5,7 @@
         <div class="header"><slot name="title"></slot></div>
         <!-- 内容 -->
         <div class="content">
-            <form class="ui form">
+            <form class="ui form" @submit.prevent="submit">
                 <input type="hidden" v-model="id">
                 <div class="field">
                     <div class="ui left labeled input">
