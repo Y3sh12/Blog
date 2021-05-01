@@ -15,6 +15,8 @@ export default {
         getTag: () => req.get("/tags"),
         // 数据统计
         getCount: () => req.get("/count"),
+        // 全局搜索
+        queryBlogList: (data) => req.get("/search", { 'query': data }),
 
     },
     // 后台文章管理

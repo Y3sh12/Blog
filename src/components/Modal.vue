@@ -74,8 +74,7 @@ export default {
             // 将数据传递到父组件中
             this.$emit("pass-data",{opt:this.data.opt,id:this.id,name:this.name,hint:this.hint});
             // 关闭模态框
-            close();
-            this.reset();
+            this.cancel();
         },
         cancel(){
             close();

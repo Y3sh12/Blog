@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <the-header />
+    <the-header @pass-data="submit" />
     <div id="blogs" class="m-container m-padding-large-responsive">
       <div class="ui container">
         <div class="ui stackable grid">
@@ -9,9 +9,10 @@
             <!-- header -->
             <blog-list-header :headline="headline"></blog-list-header>
             <!-- content 列表 -->
-            <blog-list class="ui attached segment" :list="list"></blog-list>
+            <blog-list class="ui attached segment" :list="list" v-if="headline.count > 0"></blog-list>
+            <div class="ui blue info message" v-else>请稍候，博主正在编辑中....</div>
             <!-- footer 分页 -->
-            <blog-list-footer :pages="page" @getPageNum="toPage($event)" />
+            <blog-list-footer :pages="page" @getPageNum="toPage($event)" v-show="headline.count>0" />
           </div>
           <!-- 左边博客列表 END -->
 
@@ -179,7 +180,7 @@ export default {
       recommendation:[],
       types:[],
       tags:[],
-      count:{}
+      count:{},
     };
   },
   computed:{
@@ -194,9 +195,7 @@ export default {
     this.renderBlogList();
     this.renderCard();
   },
-  mounted(){
-
-  },
+  mounted(){},
   methods:{
     async renderBlogList(data) {
       let rs = await api.font.getBlogList(data);
@@ -212,6 +211,15 @@ export default {
     },
     toPage(number){
       this.renderBlogList(number);
+    },
+    submit(data){
+      if(data.list.length > 0){
+        this.list = data.list;
+        this.page = paging(data);
+        this.headline.count = this.page.total;
+      }else {
+        this.headline.count = 0;
+      }
     }
   }
 };

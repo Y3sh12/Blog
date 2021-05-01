@@ -15,7 +15,7 @@
             <i class="home icon"></i>主页
           </router-link>
           <router-link
-            :to="'/type/'+1"
+            :to="`/type/${defaultTypeId}`"
             class="item"
             active-class="active"
             exact
@@ -24,7 +24,7 @@
             <i class="th icon"></i>分类
           </router-link>
           <router-link
-            :to="'/tag/'+1"
+            :to="`/tag/${defaultTagId}`"
             class="item"
             active-class="active"
             exact
@@ -60,7 +60,7 @@
             <i class="user icon"></i>关于
           </router-link>
           <!-- 右侧搜索框 -->
-          <div class="right item" :class="{ 'm-mobile-hide': seen }">
+          <div class="right item" :class="{ 'm-mobile-hide': seen }" title="全局搜索">
             <div class="ui icon inverted transparent input m-search">
               <input type="text" name="" id="" placeholder="Search..." v-model="keywords" @keyup.enter="toSearch" />
               <i class="search link icon m-search-icon"></i>
@@ -81,23 +81,52 @@
 </template>
 
 <script>
-
+import api from "@/api/blog.js";
 export default {
   name: "TheHeader",
   data() {
     return {
       seen: true,
-      keywords:''
+      keywords:'',
+      defaultTypeId:undefined,
+      defaultTagId:undefined
     };
   },
+
+  // 定义抛出事件
+  emits:["pass-data"],
+
+  mounted(){
+    this.getType();
+    this.getTag();
+  },
+
   methods: {
     showBarMenu() {
       this.seen = !this.seen;
       console.log(this.seen);
     },
-    toSearch(){
-      console.log("这个方法写在父组件中，通过点击调用父组件的方法");
-    }
+
+    async getType(){
+      let rs = await api.font.getType();
+      if(rs){
+        this.defaultTypeId = rs[0].id;
+      }
+    },
+
+    async getTag(){
+      let rs = await api.font.getTag();
+      if(rs){
+        this.defaultTagId = rs[0].id;
+      }
+    },
+
+    async toSearch(){
+      let rs = await api.font.queryBlogList(this.keywords);
+      // 将查询结果传给父组件
+      this.$emit("pass-data",rs);
+      this.keywords = "";
+    },
   },
 };
 </script>

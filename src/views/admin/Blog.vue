@@ -144,7 +144,7 @@ import paging from "@/data/pages.js";
 // 时间格式化
 import { formatUpdateTime } from "@/utils/format-date.js";
 export default {
-  name: "Blogs",
+  name: "Blog",
   components: {
     DataPaging,
   },

@@ -79,7 +79,7 @@ export default {
 
     async renderBlogList(pageNum){
       let rs = await api.font.getBlogListByTagId({"tagId":this.param,"pageNum":pageNum});
-      if(rs != null){
+      if(rs){
         this.list = rs.list;
         this.headline.count = rs.total;
         this.page = paging(rs);

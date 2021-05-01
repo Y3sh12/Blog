@@ -39,21 +39,4 @@ function closeMessage() {
     });
 }
 
-// 关闭模态框
-function closeModal() {
-    $('.red.button').on('click', function() {
-        $('.ui.modal').modal('hide');
-    });
-}
-
-// 新增模态框弹出
-function popupAddModal() {
-    // $('#addModal').modal('show');
-}
-
-// 编辑模态框弹出
-function popupEditModal() {
-    // $('#editModal').modal('show');
-}
-
-export { toDrop, toggleSidebar, removeClassOnSidebar, closeMessage, closeModal, popupAddModal, popupEditModal }
+export { toDrop, toggleSidebar, removeClassOnSidebar, closeMessage }
