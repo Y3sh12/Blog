@@ -10,12 +10,20 @@ const routes = [{
         name: "Type",
         component: () =>
             import ("../views/Type.vue"),
+        meta: {
+            requiresAuth: true,
+            active: "/type"
+        }
     },
     {
         path: "/tag/:tagId",
         name: "Tag",
         component: () =>
             import ("../views/Tag.vue"),
+        meta: {
+            requiresAuth: true,
+            active: "/tag"
+        }
     }, {
         path: "/archives",
         name: "Archives",

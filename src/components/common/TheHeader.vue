@@ -19,7 +19,7 @@
             class="item"
             active-class="active"
             exact
-            :class="{ 'm-mobile-hide': seen }"
+            :class="{ 'm-mobile-hide': seen,'active':$route.meta.active==='/type' }"
           >
             <i class="th icon"></i>分类
           </router-link>
@@ -28,7 +28,7 @@
             class="item"
             active-class="active"
             exact
-            :class="{ 'm-mobile-hide': seen }"
+            :class="{ 'm-mobile-hide': seen,'active':$route.meta.active==='/tag' }"
           >
             <i class="tags icon"></i>标签
           </router-link>
