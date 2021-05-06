@@ -60,8 +60,8 @@
           </td>
           <td>{{ tag.id }}</td>
           <td>{{ tag.name }}</td>
-          <td></td>
-          <td></td>
+          <td>{{updateTime(tag.createTime)}}</td>
+          <td>{{updateTime(tag.updateTime)}}</td>
           <td>
             <button type="button" class="ui mini teal button" @click="toEdit(tag.id,tag.name)">
               编辑
@@ -86,6 +86,7 @@
 import DataPaging from "@/components/DataPaging.vue";
 import Modal from "@/components/Modal.vue";
 
+import { formatUpdateTime } from "@/utils/format-date.js";
 import checked from "@/assets/js/checked.js";
 import api from "@/api/tag.js";
 import  modal from "@/assets/js/modal.js";
@@ -114,6 +115,15 @@ export default {
     };
   },
 
+computed: {
+    // 时间格式化
+    updateTime() {
+      return function (date) {
+        return formatUpdateTime(date);
+      };
+    },
+  },
+  
   // 定义抛出事件
   emits:["show","hint"],
 

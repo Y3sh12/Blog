@@ -19,17 +19,18 @@
               </div>
             </div>
             <div class="item">
-              <i class="calendar icon"></i><em>2021-12-16</em>
+              <i class="calendar icon"></i><em>{{issueDate(detail.updateTime)}}</em>
             </div>
-            <div class="item"><i class="eye icon"></i>&nbsp;<em>301</em></div>
-            <div class="item"><i class="comment icon"></i>&nbsp;<em>5</em></div>
+            <div class="item"><i class="eye icon"></i>&nbsp;<em>{{detail.views}}</em></div>
+            <div class="item"><i class="comment icon"></i>&nbsp;<em>{{detail.comments}}</em></div>
           </div>
         </div>
         <!-- header END -->
         <!-- image START -->
+        <!-- https://picsum.photos/id/20/800/420 -->
         <div class="ui attached segment">
           <img
-            src="https://picsum.photos/id/20/800/420"
+            :src="require('D:/Deng24438/Desktop/image.jpg')"
             alt="图片占位符"
             class="ui rounded fluid image"
           />
@@ -41,14 +42,15 @@
             <div class="ui orange basic label">原创</div>
           </div>
           <!-- 标题 -->
-          <h2 class="ui center aligned header">这是文章标题</h2>
+          <h2 class="ui center aligned header">{{detail.title}}</h2>
           <!-- 文章内容 -->
           <!-- typo typo-selection -->
           <div
             id="article"
             class="typo typo-selection m-padding-medium-responsive"
           >
-            <h1 id="title">
+            <div v-html="detail.content"></div>
+            <!-- <h1 id="title">
               中文网页重设与排版：<i class="serif">Typo.css</i>
             </h1>
             <br />
@@ -579,17 +581,17 @@ h5,h6{font-size:1em;}
               <a href="//zh.wikipedia.org/wiki/MIT_License">MIT License</a>
               开源，使用代码只需说明来源，或者引用
               <a href="//typo.sofi.sh/license.txt">license.txt</a> 即可。
-            </p>
+            </p> -->
           </div>
           <div class="ui horizontal divider">END</div>
           <!-- 标签 -->
           <div class="ui small tag labels m-padding-medium-responsive">
-            <a href="#" class="ui orange label">标签</a>
-            <a href="#" class="ui red label">电影</a>
+            <!-- <a href="#" class="ui orange label">标签</a> -->
+            <router-link :to="`/tag/${tagId}`" class="ui red label" v-for="(tag,tagId) in detail.tags" :key="tagId">{{tag}}</router-link>
           </div>
 
           <!-- 打赏 -->
-          <div class="ui center aligned basic segment">
+          <div class="ui center aligned basic segment" v-show="detail.admired">
             <button id="payButton" class="ui orange basic circular button">
               赞赏
             </button>
@@ -621,12 +623,12 @@ h5,h6{font-size:1em;}
         <!-- content END -->
 
         <!-- 博文版权信息 START -->
-        <div class="ui attached positive message m-blog-copyright-responsive">
+        <div class="ui attached positive message m-blog-copyright-responsive" v-show="detail.shared">
           <div class="ui middle aligned grid">
             <div class="eleven wide column">
               <ui class="ui list" style="line-height: 2">
                 <li>作者：Sanna</li>
-                <li>发表时间：2021-2-18 17:23</li>
+                <li>发表时间：{{issueTime(detail.updateTime)}}</li>
                 <li>
                   版权声明：自由转载-非商用-非衍生-保持署名（创意共享3.0许可证）
                 </li>
@@ -645,9 +647,9 @@ h5,h6{font-size:1em;}
         <!-- 博文版权信息 END -->
 
         <!-- 留言 -->
-        <div id="comments" class="ui bottom attached segment">
-          <comments></comments>
-          <comments-to-leave></comments-to-leave>
+        <div id="comments" class="ui bottom attached segment" v-show="detail.discussed">
+          <message :id="detail.id" :message="commentList" @reply-message="replyComment" @remove-message="removeComment" />
+          <comment :id="detail.id" @issue-message="issueComment" :parent-id="parentId" ref="comment" />
         </div>
       </div>
     </div>
@@ -663,8 +665,8 @@ h5,h6{font-size:1em;}
 <script>
 import TheFooter from "@/components/common/TheFooter.vue";
 import TheHeader from "@/components/common/TheHeader.vue";
-import Comments from "@/components/Comments.vue";
-import CommentsToLeave from "../components/CommentsToLeave.vue";
+import Message from "@/components/Message.vue";
+import Comment from "../components/Comment.vue";
 import ToolBar from "@/components/ToolBar.vue";
 /* 文章排版 */
 import "@/assets/lib/typo/typo.css";
@@ -674,19 +676,84 @@ import "@/assets/lib/prismjs/prism.css";
 // 赞赏弹窗
 import { appreciate } from "@/assets/js/popups.js";
 
+import {scrollToPosition} from "@/assets/js/scroll.js";
+
+import { formatIssueDate,formatUpdateTime } from "@/utils/format-date.js";
+
+import blogApi from "@/api/blog.js";
+import commentApi from "@/api/comment.js";
 export default {
   name: "Blog",
   components: {
     TheHeader,
     TheFooter,
-    Comments,
-    CommentsToLeave,
+    Message,
+    Comment,
     ToolBar,
   },
+  data(){
+    return {
+      detail:{},
+      commentList:[],
+      parentId:0,
+    }
+  },
+  // 博客ID
+  props:["id"],
+
+  computed: {
+    issueDate() {
+      return function (date) {
+        return formatIssueDate(date);
+      };
+    },
+    issueTime(){
+      return function(date){
+        return formatUpdateTime(date);
+      }
+    }
+  },
+
   mounted() {
     appreciate();
+    this.getBlog();
+    this.renderComment();
   },
-  methods: {},
+  methods: {
+    async getBlog(){
+      let rs = await blogApi.font.getBlog(this.id);
+      Object.assign(this.detail,rs);
+      console.log(this.detail);
+    },
+
+    // 渲染评论列表
+    async renderComment(){
+      let rs = await commentApi.getComment(this.id);
+      if(rs.length>0){
+        this.commentList = rs;
+      }
+    },
+
+    // 发布评论
+    async issueComment(data){
+      await commentApi.insertComment({blogId:this.id,comment:data});
+      this.renderComment();
+      this.parentId = 0;
+      // 滚动到新增的评论所在位置
+      scrollToPosition("#comments");
+    },
+
+    replyComment(id){
+      this.parentId = id;
+      this.$refs.comment.toFocus();
+    },
+
+    // 根据ID删除评论
+    async removeComment(commentId){
+      await commentApi.removeComment({blogId:this.id,commentId:commentId});
+      this.renderComment();
+    }
+  },
 };
 </script>
 

@@ -12,7 +12,7 @@
             <blog-list class="ui attached segment" :list="list" v-if="headline.count > 0"></blog-list>
             <div class="ui blue info message" v-else>请稍候，博主正在编辑中....</div>
             <!-- footer 分页 -->
-            <blog-list-footer :pages="page" @getPageNum="toPage($event)" v-show="headline.count>0" />
+            <blog-list-footer :pages="page" @getPageNum="toPage($event)" v-show="headline.count > 0" />
           </div>
           <!-- 左边博客列表 END -->
 

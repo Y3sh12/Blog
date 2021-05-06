@@ -51,20 +51,31 @@ export default {
   },
   data() {
     return {
-      text: "#### how to use mavonEditor in nuxt.js",
+      text: "",
     };
+  },
+  props:{
+    content:String,
+  },
+  watch:{
+    "text":function(val){
+      this.$emit('bind-data',val);
+    },
+    "content":function(val){
+      this.text = val;
+    }
   },
   methods: {
     handleUploadImage(event, insertImage, files) {
-      // 将files上传到服务器上
-      console.log(typeof files); //object
-      // 向编辑框中插入对应的内容
-      const imgURL =
-        "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg";
-      insertImage({
-        url: imgURL, // 服务器上的图片路径
-        desc: "哆啦A梦", // 描述
-      });
+      // // 将files上传到服务器上
+      // console.log(typeof files); //object
+      // // 向编辑框中插入对应的内容
+      // const imgURL =
+      //   "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg";
+      // insertImage({
+      //   url: imgURL, // 服务器上的图片路径
+      //   desc: "哆啦A梦", // 描述
+      // });
     },
   },
 };

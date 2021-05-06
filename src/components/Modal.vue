@@ -54,7 +54,7 @@ export default {
     },
     methods:{
         // 验证文本框输入
-        verify(){
+        validate(){
             if(!this.name){
                 this.message = "请输入新名称！";
                 return false;
@@ -68,7 +68,7 @@ export default {
             return true;
         },
         passData(){
-            if(!this.verify()){
+            if(!this.validate()){
                 return;
             }
             // 将数据传递到父组件中

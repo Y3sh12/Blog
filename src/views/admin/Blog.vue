@@ -3,53 +3,45 @@
     <!-- 快捷导航 -->
     <div class="ui pointing menu">
       <div class="right menu">
-        <router-link to="/admin/blogs" class="item">发布</router-link>
+        <router-link to="/admin/publish" class="item">发布</router-link>
         <a class="active teal item">列表</a>
       </div>
     </div>
     <!-- 表格 -->
     <div class="ui segment">
       <!-- 刷新按钮 -->
-      <div class="sync-icon"><i class="sync grey icon"></i></div>
+      <!-- <div class="sync-icon"><i class="sync grey icon"></i></div> -->
       <!-- 表单 -->
-      <form id="conditions" class="ui form m-form">
+      <form id="conditions" class="ui form m-form" @submit.prevent="submit">
         <div class="inline fields">
           <!-- 标题输入框 -->
           <div class="field">
-            <input type="text" name="title" placeholder="标题" />
+            <input type="text" name="title" placeholder="标题" v-model="searchForm.title" />
           </div>
           <!-- 分类选择 -->
           <div class="field">
-            <div class="ui selection dropdown">
-              <input id="typeInput" type="hidden" name="typeId" />
-              <i class="dropdown icon"></i>
-              <div class="default text">分类</div>
-              <div id="typeMenu" class="menu">
-                <div class="item" v-for="type in types" :key="type.id" :data-value="type.id">{{type.name}}</div>
-              </div>
-            </div>
+            <select class="ui search dropdown" v-model="searchForm.typeId">
+              <option value="">类别</option>
+              <option :value="type.id" v-for="type in types" :key="type.id">{{type.name}}</option>
+            </select>
           </div>
           <!-- 标签选择 -->
           <div class="field">
-            <div class="ui selection dropdown">
-              <input id="tagInput" type="hidden" name="tagId" />
-              <i class="dropdown icon"></i>
-              <div class="default text">标签</div>
-              <div id="tagMenu" class="menu">
-                <div class="item" v-for="tag in tags" :key="tag.id" :data-value="tag.id">{{tag.name}}</div>
-              </div>
-            </div>
+            <select class="ui search dropdown" v-model="searchForm.tagId">
+              <option value="">标签</option>
+              <option :value="tag.id" v-for="tag in tags" :key="tag.id">{{tag.name}}</option>
+            </select>
           </div>
           <!-- 推荐复选框 -->
           <div class="field">
             <div class="ui checkbox">
-              <input type="checkbox" name="recommended" id="recommend" />
+              <input type="checkbox" name="recommended" id="recommend" v-model="searchForm.recommended" />
               <label for="recommend">推荐</label>
             </div>
           </div>
           <!-- 搜索按钮 -->
           <div class="field">
-            <button type="button" class="ui icon button m-sky-blue">
+            <button type="button" class="ui icon button m-sky-blue" @click="toSearch">
               <i class="search icon"></i>
               <span class="m-mobile-hide">搜索</span>
             </button>
@@ -120,7 +112,7 @@
             </td>
             <td>{{ updateTime(blog.updateTime) }}</td>
             <td>
-              <button type="button" class="ui mini teal button editBtn">
+              <button type="button" class="ui mini teal button editBtn" @click="$router.push({path:'/admin/publish',query:{id:blog.id}})">
                 编辑
               </button>
               <button type="button" class="ui mini orange button removeBtn" @click="toRemove(blog.id)">
@@ -137,6 +129,7 @@
 <script>
 import DataPaging from "@/components/DataPaging.vue";
 
+import {toDrop} from "@/assets/js/common.js";
 import checked from "@/assets/js/checked.js";
 import api from "@/api/blog.js";
 // 分页对象封装
@@ -156,6 +149,12 @@ export default {
       tags: [], // 所有标签
       message:"",
       selected:[], // 选中项ID
+      searchForm:{
+        title:"",
+        typeId:"", // ID
+        tagId:"",
+        recommended:false // true false
+      }
     };
   },
   computed: {
@@ -166,6 +165,11 @@ export default {
       };
     },
   },
+  // watch:{
+  //   "$route":function(val){
+  //     console.log(val.query.id);
+  //   }
+  // },
   created() {
     // 初始化文章列表
     this.renderBlogList();
@@ -174,6 +178,7 @@ export default {
   },
   mounted() {
     checked();
+    toDrop();
   },
   methods: {
     async renderBlogList(data) {
@@ -214,11 +219,50 @@ export default {
           await api.back.removeBatch(this.selected.toString());
           this.renderBlogList();
         }else {
-          // 显示提示信息
-          this.message = "请至少选择一项！";
-          this.$emit('hint',this.message);
+          this.showMessage("请至少选择一项！");
         }
     },
+
+    // 搜索
+    async toSearch(){
+      if(!this.validate()){
+        return false;
+      }
+      let rs = await api.back.queryBlogList(this.searchForm);
+      console.log(rs);
+      if(rs && rs.list.length > 0){
+        this.list = rs.list;
+        this.page = paging(rs);
+      }else if(rs && rs.list.length === 0) {
+        this.showMessage("没有任何查询结果");
+        this.renderBlogList();
+      }else if(!rs) {
+        console.log("查询失败");
+      }
+    },
+
+    // 校验文本框
+    validate(){
+      if(!this.searchForm.title && !this.searchForm.typeId && !this.searchForm.tagId && !this.searchForm.recommended){
+        this.showMessage("至少选填一个查询关键字段");
+        return false;
+      }
+      return true;
+    },
+
+    // 显示提示信息
+    showMessage(msg){
+      this.message = msg;
+      this.$emit('hint',this.message);
+    },
+
+    // 隐藏提示信息
+    hideMessage(){
+      this.message = "";
+      this.$emit('show',false);
+    },
+
+    
   },
 };
 </script>

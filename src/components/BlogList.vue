@@ -49,10 +49,12 @@
         </div>
         <!-- 文章概要 END -->
         <!-- 展示图 START -->
+        <!-- {{blog.image}}'D:/Deng24438/Desktop/image.jpg' -->
+        <!-- :src="require(`D:/Deng24438/Desktop/${blog.image}`)" -->
         <div class="five wide column">
-          <router-link to="/blog" target="_blank">
+          <router-link :to="`/blog/${blog.id}`" target="_blank">
             <img
-              :src="blog.image"
+              :src="require('D:/Deng24438/Desktop/image.jpg')"
               alt="图片占位符"
               class="ui rounded fluid image"
             />

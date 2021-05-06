@@ -17,6 +17,8 @@ export default {
         getCount: () => req.get("/count"),
         // 全局搜索
         queryBlogList: (data) => req.get("/search", { 'query': data }),
+        // 博客详情
+        getBlog: (data) => req.get(`/blog/${data}`),
 
     },
     // 后台文章管理
@@ -29,6 +31,14 @@ export default {
         removeSingleBlog: (data) => req.get(`/admin/blog/${data}`),
         // 批量删除
         removeBatch: (data) => req.get("/admin/blog/remove", { 'ids': data }),
+        // 文章搜索
+        queryBlogList: (data) => req.post("/admin/blog/search", data),
+        // 保存 发布
+        saveBlog: (data) => req.post("/admin/blog", data),
+        // 数据回显
+        getBlog: (data) => req.get(`/admin/blog/${data}/show`),
+        // 编辑
+        updateBlog: (data) => req.post(`/admin/blog/${data}`),
 
     }
 }

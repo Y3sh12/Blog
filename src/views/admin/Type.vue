@@ -60,8 +60,8 @@
           </td>
           <td>{{ type.id }}</td>
           <td>{{ type.name }}</td>
-          <td></td>
-          <td></td>
+          <td>{{updateTime(type.createTime)}}</td>
+          <td>{{updateTime(type.updateTime)}}</td>
           <td>
             <button type="button" class="ui mini teal button" @click="toEdit(type.id,type.name)">
               编辑
@@ -87,6 +87,7 @@
 import DataPaging from "@/components/DataPaging.vue";
 import Modal from "@/components/Modal.vue";
 
+import { formatUpdateTime } from "@/utils/format-date.js";
 import checked from "@/assets/js/checked.js";
 import api from "@/api/type.js";
 import  modal from "@/assets/js/modal.js";
@@ -115,6 +116,16 @@ export default {
       hint:"", // 模态框中的文本框提示
     };
   },
+
+  computed: {
+    // 时间格式化
+    updateTime() {
+      return function (date) {
+        return formatUpdateTime(date);
+      };
+    },
+  },
+  
   // 定义抛出事件
   emits:["show","hint"],
   

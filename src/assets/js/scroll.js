@@ -21,4 +21,8 @@ function scrollToTop() {
     $(window).scrollTo(0, 500);
 }
 
-export { listener, scrollToTop }
+// 平滑滚动道指定位置
+function scrollToPosition(position) {
+    $(window).scrollTo(position, 500);
+}
+export { listener, scrollToTop, scrollToPosition }
