@@ -9,48 +9,22 @@
         <!-- header END -->
 
         <!-- content START -->
-        <h3 class="ui center aligned header">2021</h3>
-        <div class="ui fluid vertical menu m-title-menu">
-          <a href="#" class="item">
-            <span>
-              <i class="mini teal caret right icon"></i>
-              <em>今年我毕业啦</em>
-              <div
-                class="ui teal basic left pointing label m-padding-tiny m-text-thin"
-              >
-                2月2日
-              </div>
-            </span>
-            <div class="ui orange basic label m-text-thin">原创</div>
-          </a>
-          <a href="#" class="item">
-            <span>
-              <i class="mini teal caret right icon"></i>
-              <em>今年我毕业啦</em>
-              <div
-                class="ui teal basic left pointing label m-padding-tiny m-text-thin"
-              >
-                2月2日
-              </div>
-            </span>
-            <div class="ui orange basic label m-text-thin">原创</div>
-          </a>
+        <div v-for="(block,i) in list" :key="i">
+          <h3 class="ui center aligned header">{{block.year}}</h3>
+          <div class="ui fluid vertical menu m-title-menu">
+            <router-link :to="`/blog/${item.id}`" class="item" v-for="item in block.blogList" :key="item.id">
+              <span>
+                <i class="mini teal caret right icon"></i>
+                <em>{{item.title}}</em>
+                <div
+                  class="ui teal basic left pointing label m-padding-tiny m-text-thin"
+                >
+                  {{formatDate(item.updateTime)}}
+                </div>
+              </span>
+              <div class="ui orange basic label m-text-thin">{{item.mark}}</div>
+            </router-link>
         </div>
-
-        <h3 class="ui center aligned header">2020</h3>
-        <div class="ui fluid vertical menu m-title-menu">
-          <a href="#" class="item">
-            <span>
-              <i class="mini teal caret right icon"></i>
-              <em>关于2020年的那些事</em>
-              <div
-                class="ui teal basic left pointing label m-padding-tiny m-text-thin"
-              >
-                9月2日
-              </div>
-            </span>
-            <div class="ui orange basic label m-text-thin">原创</div>
-          </a>
         </div>
         <!-- content END -->
       </div>
@@ -64,6 +38,12 @@
 import BlogListHeader from "@/components/BlogListHeader.vue";
 import TheHeader from "@/components/common/TheHeader.vue";
 import TheFooter from "@/components/common/TheFooter.vue";
+
+import api from "@/api/blog.js";
+// 分页对象封装
+import paging from "@/data/pages.js";
+
+import {formatArchiveDate} from "@/utils/format-date.js";
 export default {
   name: "Archives",
   components: {
@@ -74,11 +54,31 @@ export default {
   data() {
     return {
       headline: {
-        title: "归档",
-        count: 14,
+        title: "我的博客",
+        count: 0,
       },
+      list:[],
     };
   },
+  computed:{
+    formatDate(){
+      return function(date){
+        return formatArchiveDate(date);
+      }
+    }
+  },
+  created(){
+    // 初始化
+    this.renderBlogList();
+  },
+  methods:{
+    async renderBlogList() {
+      this.list = await api.font.archive();
+      let count = await api.font.getCount();
+      this.headline.count = count.blogTotal;
+      console.log(this.headline.count)
+    },
+  }
 };
 </script>
 
@@ -98,6 +98,9 @@ export default {
   padding: 0 0.2em 0 0.3em;
 }
 
+.ui.header:first-child {
+  margin: calc(2rem - .14285714em) 0 1rem;
+}
 /* ------ 移动端 ------ */
 
 @media screen and (max-width: 768px) {

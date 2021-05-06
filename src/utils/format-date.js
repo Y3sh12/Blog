@@ -27,4 +27,8 @@ function formatIssueDate(date) {
 function formatLastUpdateTime(date) {
     return moment(date).format('YYYY/MM/DD HH:mm');
 }
-export { formatCurrentDate, formatUpdateTime, formatIssueDate, formatLastUpdateTime }
+
+function formatArchiveDate(date) {
+    return moment(date).format("MM-DD");
+}
+export { formatCurrentDate, formatUpdateTime, formatIssueDate, formatLastUpdateTime, formatArchiveDate }

@@ -19,6 +19,8 @@ export default {
         queryBlogList: (data) => req.get("/search", { 'query': data }),
         // 博客详情
         getBlog: (data) => req.get(`/blog/${data}`),
+        // 已发布文章按年份归档
+        archive: () => req.get("/archive"),
 
     },
     // 后台文章管理
@@ -39,6 +41,5 @@ export default {
         getBlog: (data) => req.get(`/admin/blog/${data}/show`),
         // 编辑
         updateBlog: (data) => req.post(`/admin/blog/${data}`),
-
     }
 }
