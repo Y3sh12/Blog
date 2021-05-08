@@ -2,21 +2,102 @@
   <div class="user-container user-find">
     <form class="user-form">
       <h2 class="user-form-title">找回密码</h2>
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <input type="text" name="username" placeholder="Username" autocomplete="off" v-model="username" @blur="validate('用户名',username)" ref="username" />
+      <input type="password" name="password" placeholder="Password" autocomplete="off" v-model="password" @blur="checkPassword" ref="password" />
       <input
         type="password"
         name="confirm"
         placeholder="Confirm Password"
-        required
+        autocomplete="off"
+        v-model="confirm"
+        @blur="confirmPassword"
       />
-      <div class="msg hidden">密码长度6-14位，必须同时包含数字和字母！</div>
-      <button type="button" class="btn">确定</button>
+      <div id="msg" class="msg" v-show="message!=''">{{message}}</div>
+      <!-- 密码长度6-14位，必须同时包含数字和字母！ -->
+      <button type="button" class="btn" @click="submit">确定</button>
     </form>
   </div>
 </template>
 <script>
-export default {};
+import api from "@/api/user.js";
+export default {
+  name:"PasswordForm",
+  data(){
+    return {
+      username:"",
+      password:"",
+      confirm:"",
+      message:""
+    }
+  },
+  methods:{
+    // 验证输入框
+    validate(label,input){
+      if(!input){
+        // 不能为空
+        this.message = `请输入${label}`;
+        return false;
+      }
+      if(/^\s+$/gi.test(input)){
+        // 不能输入纯空格
+        this.message = `不能输入纯空格，请输入正确的${label}`;
+        return false;
+      }
+      this.message ="";
+      return true;
+    },
+
+
+    // 校验密码
+    checkPassword(){
+      let pattern  = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,14}$/;
+      if(!this.validate("密码",this.password)){
+        return false;
+      }
+      if(!pattern.test(this.password)){
+        this.message = "密码长度6-14位，必须同时包含数字和字母！";
+        return false;
+      }
+      return true;
+    },
+
+    // 校验两次密码输入
+    confirmPassword(){
+      if(!this.validate("确认密码",this.confirm)){
+        return false;
+      }
+      if(this.confirm.trim() !== this.password.trim()){
+        this.message = "两次密码输入不一致，请重新输入！";
+        this.password = "";
+        this.confirm = "";
+        this.$refs.password.focus();
+        return false;
+      }
+      this.message = "";
+      return true;
+    },
+
+    // 确认提交
+    async submit(){
+      // 销毁token
+      this.$store.commit("LOGOUT");
+      if(!this.username || !this.password || !this.confirm){
+        this.$refs.username.focus();
+        this.message = "请将表单信息填写完整！";
+        return false;
+      }
+      if(!this.confirmPassword()){
+        return false;
+      }
+      // 提交
+      let rs = await api.findPassword({username:this.username,password:this.password});
+      this.message = rs.message;
+      this.username = "";
+      this.password = "";
+      this.confirm = "";
+    }
+  }
+};
 </script>
 <style scoped>
 /* 表单 */

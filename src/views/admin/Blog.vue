@@ -165,11 +165,6 @@ export default {
       };
     },
   },
-  // watch:{
-  //   "$route":function(val){
-  //     console.log(val.query.id);
-  //   }
-  // },
   created() {
     // 初始化文章列表
     this.renderBlogList();
@@ -229,15 +224,13 @@ export default {
         return false;
       }
       let rs = await api.back.queryBlogList(this.searchForm);
-      console.log(rs);
-      if(rs && rs.list.length > 0){
-        this.list = rs.list;
-        this.page = paging(rs);
-      }else if(rs && rs.list.length === 0) {
-        this.showMessage("没有任何查询结果");
-        this.renderBlogList();
-      }else if(!rs) {
-        console.log("查询失败");
+      // console.log(rs);
+      if(rs.data && rs.data.list.length > 0){
+        this.list = rs.data.list;
+        this.page = paging(rs.data);
+      } else if(rs.data && rs.data.list.length === 0){
+          this.showMessage("没有任何查询结果");
+          this.renderBlogList();
       }
     },
 

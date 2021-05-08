@@ -20,5 +20,8 @@ export default {
         update: (data) => req.post(`/admin/tag/${data.id}`, data),
         // 搜索
         search: (data) => req.get("/admin/tag/search", { 'name': data.value, 'pageNum': data.pageNum }),
-    }
+    },
+
+    // 所有标签并分页
+    getTagList: (data) => req.get("/admin/tag", { 'pageNum': data.pageNum, 'pageSize': data.pageSize }),
 }

@@ -20,14 +20,14 @@
         "semantic-ui-css": "^2.4.1",
         "tocbot": "^4.12.2",
         "vue": "^3.0.0",
-        "vue-router": "^4.0.0-0"
+        "vue-router": "^4.0.0-alpha.6",
+        "vuex": "^4.0.0-alpha.1"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.0",
         "@vue/cli-plugin-router": "~4.5.0",
         "@vue/cli-service": "~4.5.0",
         "@vue/compiler-sfc": "^3.0.0"
-
     },
     "browserslist": [
         "> 1%",

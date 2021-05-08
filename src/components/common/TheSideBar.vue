@@ -35,6 +35,7 @@
         active-class="m-active"
         exact
         :class="{ 'm-mobile-show': seen }"
+        @click="logout"
       >
         <i class="sign-out icon"></i>退出登录
       </router-link>
@@ -54,6 +55,12 @@ export default {
   mounted() {
     removeClassOnSidebar();
   },
+
+  methods:{
+    logout(){
+      this.$store.commit("LOGOUT");
+    }
+  }
 };
 </script>
 <style scoped>

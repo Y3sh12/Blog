@@ -41,5 +41,9 @@ export default {
         getBlog: (data) => req.get(`/admin/blog/${data}/show`),
         // 编辑
         updateBlog: (data) => req.post(`/admin/blog/${data}`),
-    }
+    },
+
+    // 文章信息并分页
+    getBlogList: (data) => req.get('/admin/blog', { 'pageNum': data.pageNum, 'pageSize': data.pageSize }),
+
 }

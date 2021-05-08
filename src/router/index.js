@@ -12,7 +12,6 @@ const routes = [{
         component: () =>
             import ("../views/Type.vue"),
         meta: {
-            requiresAuth: true,
             active: "/type"
         }
     },
@@ -22,7 +21,6 @@ const routes = [{
         component: () =>
             import ("../views/Tag.vue"),
         meta: {
-            requiresAuth: true,
             active: "/tag"
         }
     },
@@ -60,32 +58,50 @@ const routes = [{
                 path: "blog",
                 component: () =>
                     import ("../views/admin/Blog.vue"),
+                meta: {
+                    requireAuth: true
+                },
             },
             {
                 path: "type",
                 component: () =>
                     import ("../views/admin/Type.vue"),
+                meta: {
+                    requireAuth: true
+                },
                 children: [{
                     path: "search",
                     component: () =>
-                        import ("../views/admin/Type.vue")
+                        import ("../views/admin/Type.vue"),
+                    meta: {
+                        requireAuth: true
+                    }
                 }]
             },
             {
                 path: "tag",
                 component: () =>
                     import ("../views/admin/Tag.vue"),
+                meta: {
+                    requireAuth: true
+                },
                 children: [{
                     path: "search",
                     component: () =>
-                        import ("../views/admin/Tag.vue")
+                        import ("../views/admin/Tag.vue"),
+                    meta: {
+                        requireAuth: true
+                    }
                 }, ]
             },
             {
                 path: "publish",
                 name: "Publish",
                 component: () =>
-                    import ("../views/admin/Publish.vue")
+                    import ("../views/admin/Publish.vue"),
+                meta: {
+                    requireAuth: true
+                }
             },
         ]
     },
@@ -101,12 +117,6 @@ const routes = [{
         component: () =>
             import ("../views/admin/GetPassword.vue")
     },
-    {
-        path: "/admin/test",
-        name: "Test",
-        component: () =>
-            import ("../test/test.vue")
-    }
 ];
 
 const router = createRouter({
